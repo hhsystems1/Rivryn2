@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigation } from './stores/navigationStore';
 import { BottomNav } from './components/navigation/BottomNav';
+import { FloatingMenu } from './components/navigation/FloatingMenu';
 import { Dashboard } from './pages/Dashboard';
 import { FilesPage } from './pages/Files';
 import { CodePage } from './pages/Code';
@@ -48,6 +49,14 @@ function App() {
       <div className="flex-1 overflow-hidden">
         {renderPage()}
       </div>
+      <FloatingMenu
+        projectId={activeProject}
+        activeFile={activeFile}
+        onFileSelect={(file) => {
+          setActiveFile(file);
+          setPage('code');
+        }}
+      />
       <BottomNav />
     </div>
   );
