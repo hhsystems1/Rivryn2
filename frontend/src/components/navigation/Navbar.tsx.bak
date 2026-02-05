@@ -1,0 +1,371 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  Play,
+  Eye,
+  FolderOpen,
+  X,
+  MessageSquare,
+  Terminal,
+  Upload,
+  Database,
+  Lock,
+  Settings,
+  Lightbulb,
+  Box,
+  Link as LinkIcon,
+  Code,
+  FileCode,
+  Bug,
+  GitBranch,
+  Cloud,
+  Shield,
+  Zap,
+  Cpu,
+  Globe,
+  Layout,
+  Package,
+  Users,
+  Key,
+} from 'lucide-react';
+
+interface NavbarProps {
+  onAction?: (action: string) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onAction }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const navbarRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // All available menu items
+  const allMenuItems = useMemo(() => [
+    { id: 'agent-chat', icon: <MessageSquare />, label: 'Agent Chat', accent: true },
+    { id: 'files', icon: <FolderOpen />, label: 'Files' },
+    { id: 'terminal', icon: <Terminal />, label: 'Terminal' },
+    { id: 'run', icon: <Play />, label: 'Run' },
+    { id: 'preview', icon: <Eye />, label: 'Preview' },
+    { id: 'code', icon: <Code />, label: 'Editor' },
+    { id: 'skills-ai', icon: <Lightbulb />, label: 'Skills AI' },
+    { id: 'mcp-servers', icon: <Box />, label: 'MCP Servers' },
+    { id: 'deploy', icon: <Upload />, label: 'Deploy' },
+    { id: 'database', icon: <Database />, label: 'Database' },
+    { id: 'auth', icon: <Lock />, label: 'Auth' },
+    { id: 'settings', icon: <Settings />, label: 'Settings' },
+    { id: 'git', icon: <GitBranch />, label: 'Git' },
+    { id: 'debug', icon: <Bug />, label: 'Debug' },
+    { id: 'packages', icon: <Package />, label: 'Packages' },
+    { id: 'secrets', icon: <Key />, label: 'Secrets' },
+    { id: 'users', icon: <Users />, label: 'Team' },
+    { id: 'analytics', icon: <Layout />, label: 'Analytics' },
+    { id: 'api', icon: <Globe />, label: 'API' },
+    { id: 'compute', icon: <Cpu />, label: 'Compute' },
+    { id: 'security', icon: <Shield />, label: 'Security' },
+    { id: 'integrations', icon: <LinkIcon />, label: 'Integrations' },
+    { id: 'add-integration', icon: <Zap />, label: 'Quick Add' },
+    { id: 'cloud', icon: <Cloud />, label: 'Cloud' },
+    { id: 'exit-project', icon: <X />, label: 'Exit Project', danger: true },
+  ], []);
+
+  // Split items into main grid and overflow sides
+  const { mainItems, leftOverflow, rightOverflow } = useMemo(() => {
+    const main = allMenuItems.slice(0, visibleCount);
+    const overflow = allMenuItems.slice(visibleCount);
+    const mid = Math.ceil(overflow.length / 2);
+    return {
+      mainItems: main,
+      leftOverflow: overflow.slice(0, mid),
+      rightOverflow: overflow.slice(mid),
+    };
+  }, [allMenuItems, visibleCount]);
+
+  // Calculate visible items based on width
+  useEffect(() => {
+    const updateVisibleCount = () => {
+      if (menuRef.current) {
+        const width = menuRef.current.offsetWidth;
+        // 3 columns at ~100px each, show ~12 items by default
+        const cols = Math.max(3, Math.min(6, Math.floor(width / 100)));
+        setVisibleCount(cols * 3); // 3 rows worth
+      }
+    };
+
+    updateVisibleCount();
+    window.addEventListener('resize', updateVisibleCount);
+    return () => window.removeEventListener('resize', updateVisibleCount);
+  }, []);
+
+  const handleAction = (action: string) => {
+    console.log('Action:', action);
+    if (onAction) {
+      onAction(action);
+    }
+  };
+
+  return (
+    <nav
+      ref={navbarRef}
+      className={`fixed bottom-0 left-0 right-0 z-50 bg-slate-800/80 backdrop-blur-xl border-t border-slate-700/50 transition-all duration-400 ease-out ${
+        isExpanded
+          ? 'h-[85vh] rounded-t-3xl shadow-[0_-20px_60px_rgba(0,0,0,0.6)]'
+          : 'h-14'
+      }`}
+    >
+      {/* Quick Actions Bar - Always Visible */}
+      <div
+        className={`flex items-center justify-around h-14 px-3 transition-opacity duration-300 ${
+          isExpanded ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
+      >
+        <QuickButton
+          icon={<Play className="w-5 h-5 fill-emerald-500" />}
+          label="Run"
+          onClick={() => handleAction('run')}
+        />
+        <QuickButton
+          icon={<Eye className="w-5 h-5" />}
+          label="Preview"
+          onClick={() => handleAction('preview')}
+        />
+        <QuickButton
+          icon={<FolderOpen className="w-5 h-5" />}
+          label="Files"
+          onClick={() => handleAction('files')}
+        />
+        <QuickButton
+          icon={<X className="w-5 h-5 stroke-red-500" />}
+          label="Exit"
+          onClick={() => handleAction('exit')}
+          className="text-red-500"
+        />
+      </div>
+
+      {/* Toggle Button */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 z-10 ${
+          isExpanded ? 'top-4' : 'top-1/2 -translate-y-1/2'
+        }`}
+        aria-label="Toggle navigation"
+      >
+        <div className="w-5 h-3.5 flex flex-col justify-between">
+          <span
+            className={`block w-full h-0.5 bg-white rounded-full transition-all duration-300 ${
+              isExpanded ? 'rotate-45 translate-y-1.5' : ''
+            }`}
+          />
+          <span
+            className={`block w-full h-0.5 bg-white rounded-full transition-all duration-300 ${
+              isExpanded ? 'opacity-0 scale-x-0' : ''
+            }`}
+          />
+          <span
+            className={`block w-full h-0.5 bg-white rounded-full transition-all duration-300 ${
+              isExpanded ? '-rotate-45 -translate-y-1.5' : ''
+            }`}
+          />
+        </div>
+      </button>
+
+      {/* Expanded Menu */}
+      <div
+        className={`absolute top-[70px] left-0 right-0 bottom-0 transition-all duration-400 ease-out ${
+          isExpanded
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 translate-y-5 pointer-events-none'
+        }`}
+      >
+        {/* Left Overflow - Curved up the side */}
+        {leftOverflow.length > 0 && (
+          <div className="absolute left-2 top-0 bottom-20 w-16 flex flex-col-reverse gap-2 items-center py-4 overflow-y-auto">
+            {leftOverflow.map((item: any, index: number) => (
+              <SideOverflowItem
+                key={item.id}
+                item={item}
+                index={index}
+                side="left"
+                onClick={() => handleAction(item.id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Right Overflow - Curved up the side */}
+        {rightOverflow.length > 0 && (
+          <div className="absolute right-2 top-0 bottom-20 w-16 flex flex-col-reverse gap-2 items-center py-4 overflow-y-auto">
+            {rightOverflow.map((item: any, index: number) => (
+              <SideOverflowItem
+                key={item.id}
+                item={item}
+                index={index}
+                side="right"
+                onClick={() => handleAction(item.id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Main Grid */}
+        <div
+          ref={menuRef}
+          className="absolute left-20 right-20 top-0 bottom-0 overflow-y-auto px-2 pb-4"
+        >
+          <div
+            className="grid gap-2"
+            style={{
+              gridTemplateColumns: `repeat(${Math.max(3, Math.floor((menuRef.current?.offsetWidth || 300) / 100))}, minmax(0, 1fr))`,
+            }}
+          >
+            {mainItems.map((item: any) => (
+              <MenuItem
+                key={item.id}
+                icon={item.icon}
+                label={item.label}
+                onClick={() => handleAction(item.id)}
+                accent={item.accent}
+                danger={item.danger}
+              />
+            ))}
+          </div>
+          
+          {/* More indicator if there are overflow items */}
+          {(leftOverflow.length > 0 || rightOverflow.length > 0) && (
+            <div className="text-center mt-4 text-slate-500 text-xs">
+              +{leftOverflow.length + rightOverflow.length} more on the sides
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Quick Button Component
+interface QuickButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  className?: string;
+}
+
+const QuickButton: React.FC<QuickButtonProps> = ({ icon, label, onClick, className }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-slate-400 text-[11px] font-medium transition-all active:scale-95 active:bg-slate-700 hover:bg-slate-700/50 ${className}`}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+};
+
+// Menu Section Component
+interface MenuSectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const MenuSection: React.FC<MenuSectionProps> = ({ title, children }) => {
+  return (
+    <div className="mb-6">
+      {title && (
+        <div className="text-xs font-semibold uppercase text-slate-400 mb-2 px-1 tracking-wider">
+          {title}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+};
+
+// Menu Grid Component
+const MenuGrid: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {children}
+    </div>
+  );
+};
+
+// Menu Item Component
+interface MenuItemProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  accent?: boolean;
+  danger?: boolean;
+  className?: string;
+  labelClassName?: string;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({
+  icon,
+  label,
+  onClick,
+  accent,
+  danger,
+  className,
+  labelClassName,
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center gap-2 p-4 rounded-2xl text-white transition-all active:scale-95 ${
+        accent
+          ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-transparent'
+          : danger
+          ? 'bg-red-500/10 border border-red-500/30'
+          : 'bg-slate-700/30 border border-slate-600/50 active:bg-slate-700/50'
+      } ${className}`}
+    >
+      <div className={`w-7 h-7 ${danger ? 'text-red-400' : ''}`}>{icon}</div>
+      <span className={`text-xs font-medium text-center ${danger ? 'text-red-400' : ''} ${labelClassName}`}>{label}</span>
+    </button>
+  );
+};
+
+// Side Overflow Item Component
+interface SideOverflowItemProps {
+  item: any;
+  index: number;
+  side: 'left' | 'right';
+  onClick: () => void;
+}
+
+const SideOverflowItem: React.FC<SideOverflowItemProps> = ({
+  item,
+  index,
+  side,
+  onClick,
+}) => {
+  // Calculate rotation and offset for curved effect
+  const baseRotation = side === 'left' ? -15 : 15;
+  const rotation = baseRotation + (index * 5 * (side === 'left' ? -1 : 1));
+  const translateY = index * 2;
+
+  return (
+    <button
+      onClick={onClick}
+      className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all active:scale-90 hover:scale-105 ${
+        item.accent
+          ? 'bg-gradient-to-br from-indigo-500 to-purple-600'
+          : item.danger
+          ? 'bg-red-500/20 border border-red-500/30'
+          : 'bg-slate-700/50 border border-slate-600/50 hover:bg-slate-700'
+      }`}
+      style={{
+        transform: `rotate(${rotation}deg) translateY(${translateY}px)`,
+      }}
+    >
+      <div className={`w-5 h-5 ${item.danger ? 'text-red-400' : 'text-slate-300'}`}>
+        {item.icon}
+      </div>
+      <span className={`text-[8px] leading-tight text-center px-1 ${item.danger ? 'text-red-400' : 'text-slate-400'}`}>
+        {item.label.length > 6 ? item.label.slice(0, 5) + '…' : item.label}
+      </span>
+    </button>
+  );
+};
+
+export default Navbar;

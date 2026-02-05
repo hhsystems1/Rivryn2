@@ -29,14 +29,27 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
     setPrompt('');
   };
 
-  const createNewProject = () => {
+  const createNewProject = async () => {
     const newProject: Project = {
       id: Date.now().toString(),
       name: 'New Project',
       description: 'Created just now',
       lastModified: 'Just now',
     };
+    
+    // Create project on backend
+    try {
+      await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: newProject.id, name: newProject.name }),
+      });
+    } catch (err) {
+      console.error('Failed to create project:', err);
+    }
+    
     setProjects([newProject, ...projects]);
+    onSelectProject(newProject.id);
   };
 
   return (

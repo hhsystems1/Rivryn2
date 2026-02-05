@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useNavigation } from './stores/navigationStore';
-import { BottomNav } from './components/navigation/BottomNav';
-import { FloatingMenu } from './components/navigation/FloatingMenu';
+import { useNavigation, Page } from './stores/navigationStore';
+import Navbar from './components/navigation/Navbar';
 import { Dashboard } from './pages/Dashboard';
 import { FilesPage } from './pages/Files';
 import { CodePage } from './pages/Code';
@@ -25,7 +24,6 @@ function App() {
       case 'files':
         return (
           <FilesPage
-            projectId={activeProject}
             activeFile={activeFile}
             onFileSelect={(file) => {
               setActiveFile(file);
@@ -34,7 +32,7 @@ function App() {
           />
         );
       case 'code':
-        return <CodePage projectId={activeProject} activeFile={activeFile} />;
+        return <CodePage activeFile={activeFile} />;
       case 'terminal':
         return <TerminalPage projectId={activeProject} />;
       case 'settings':
@@ -49,15 +47,13 @@ function App() {
       <div className="flex-1 overflow-hidden">
         {renderPage()}
       </div>
-      <FloatingMenu
-        projectId={activeProject}
-        activeFile={activeFile}
-        onFileSelect={(file) => {
-          setActiveFile(file);
-          setPage('code');
+      <Navbar
+        onNavigate={(page) => setPage(page as Page)}
+        onAction={(action) => {
+          console.log('Action:', action);
+          // TODO: Implement actions like run, preview, deploy, etc.
         }}
       />
-      <BottomNav />
     </div>
   );
 }

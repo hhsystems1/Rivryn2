@@ -3,10 +3,9 @@ import Editor from '@monaco-editor/react';
 
 interface MonacoEditorProps {
   filePath: string | null;
-  projectId: string;
 }
 
-export function MonacoEditor({ filePath, projectId }: MonacoEditorProps) {
+export function MonacoEditor({ filePath }: MonacoEditorProps) {
   const [content, setContent] = useState('');
 
   useEffect(() => {
@@ -14,15 +13,15 @@ export function MonacoEditor({ filePath, projectId }: MonacoEditorProps) {
       setContent('');
       return;
     }
-    fetch(`/api/files/${projectId}/${filePath}`)
+    fetch(`/api/files/${filePath}`)
       .then(res => res.json())
       .then(data => setContent(data.content || ''))
       .catch(() => setContent(''));
-  }, [filePath, projectId]);
+  }, [filePath]);
 
   const handleSave = (value: string | undefined) => {
     if (!filePath || !value) return;
-    fetch(`/api/files/${projectId}/${filePath}`, {
+    fetch(`/api/files/${filePath}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: value })
