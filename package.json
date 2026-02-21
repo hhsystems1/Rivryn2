@@ -15,7 +15,6 @@
     "build:frontend": "cd frontend && npm run build"
   },
   "devDependencies": {
-    "@rollup/rollup-darwin-arm64": "^4.57.1",
     "concurrently": "^8.2.2"
   }
 }
