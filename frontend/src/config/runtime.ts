@@ -1,7 +1,7 @@
 const RAW_API_BASE = (import.meta.env.VITE_API_BASE_URL || '').trim();
 const RAW_WS_BASE = (import.meta.env.VITE_WS_BASE_URL || '').trim();
 
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+const API_BASE = sanitizeBaseUrl(RAW_API_BASE);
 const WS_BASE = (RAW_WS_BASE || toWebSocketBase(API_BASE)).replace(/\/+$/, '');
 
 export function apiUrl(path: string): string {
@@ -38,4 +38,20 @@ function toWebSocketBase(httpBase: string): string {
     return `ws://${httpBase.slice('http://'.length)}`;
   }
   return httpBase;
+}
+
+function sanitizeBaseUrl(input: string): string {
+  const normalized = input.replace(/\/+$/, '');
+  if (!normalized) {
+    return '';
+  }
+  const lowered = normalized.toLowerCase();
+  if (
+    lowered.includes('your-backend-domain.com') ||
+    lowered.includes('example.com')
+  ) {
+    console.warn('VITE_API_BASE_URL is still a placeholder. Falling back to relative /api paths.');
+    return '';
+  }
+  return normalized;
 }

@@ -119,13 +119,6 @@ export function WorkspacePage({ projectId, activeFile, onFileSelect }: Workspace
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <button
-            onClick={createItem}
-            className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-            title="Create item from input"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
         </div>
       </div>
       {message && (
@@ -150,6 +143,16 @@ export function WorkspacePage({ projectId, activeFile, onFileSelect }: Workspace
       <div className="flex-1 min-h-0 flex">
         <aside className={`${mobileView === 'editor' ? 'hidden md:flex' : 'flex'} md:w-80 w-full border-r border-slate-700 flex-col`}>
           <div className="px-3 py-2 border-b border-slate-700">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-slate-300">Files</p>
+              <button
+                onClick={createItem}
+                className="p-1.5 rounded-md hover:bg-slate-700 transition-colors"
+                title={`Create ${createType}`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
             <div className="flex items-center gap-1 text-xs text-slate-400 mb-2 overflow-x-auto">
               <button onClick={goRoot} className="hover:text-white">root</button>
               {breadcrumbs.map((part, idx) => (
