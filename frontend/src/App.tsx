@@ -101,6 +101,11 @@ function App() {
   };
 
   const executeAction = async (action: string) => {
+    const comingSoon = (label: string) => {
+      setStatusMessage(`${label} is coming soon.`);
+      setTimeout(() => setStatusMessage(null), 2200);
+    };
+
     switch (action) {
       case 'run':
         await checkDevServerStatus();
@@ -108,24 +113,47 @@ function App() {
       case 'preview':
         setPage('agents');
         break;
-      case 'deploy':
-      case 'database':
-      case 'auth':
-      case 'secrets':
-      case 'users':
-      case 'analytics':
-      case 'api':
-      case 'cloud':
-      case 'security':
-      case 'git':
-      case 'debug':
-      case 'packages':
       case 'agent-chat':
       case 'skills-ai':
       case 'mcp-servers':
         setPage('agents');
-        setStatusMessage('This section routes to Agents for now.');
-        setTimeout(() => setStatusMessage(null), 2200);
+        comingSoon('Advanced AI tools');
+        break;
+      case 'deploy':
+        comingSoon('Deploy');
+        break;
+      case 'database':
+        comingSoon('Database');
+        break;
+      case 'auth':
+        comingSoon('Auth');
+        break;
+      case 'secrets':
+        comingSoon('Secrets');
+        break;
+      case 'users':
+        comingSoon('Team');
+        break;
+      case 'analytics':
+        comingSoon('Analytics');
+        break;
+      case 'api':
+        comingSoon('API');
+        break;
+      case 'cloud':
+        comingSoon('Cloud');
+        break;
+      case 'security':
+        comingSoon('Security');
+        break;
+      case 'git':
+        comingSoon('Git tools');
+        break;
+      case 'debug':
+        comingSoon('Debugger');
+        break;
+      case 'packages':
+        comingSoon('Package manager');
         break;
       case 'integrations':
         setPage('integrations');
