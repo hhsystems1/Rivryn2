@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, MessageSquare, Play, Folder } from 'lucide-react';
+import { apiUrl } from '../config/runtime';
 
 interface Project {
   id: string;
@@ -21,6 +22,8 @@ interface DashboardProps {
 export function Dashboard({ onSelectProject }: DashboardProps) {
   const [prompt, setPrompt] = useState('');
   const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const handlePromptSubmit = () => {
     if (!prompt.trim()) return;
@@ -30,26 +33,45 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
   };
 
   const createNewProject = async () => {
-    const newProject: Project = {
+    setIsCreating(true);
+    setCreateError(null);
+
+    let newProject: Project = {
       id: Date.now().toString(),
-      name: 'New Project',
+      name: `Project ${projects.length + 1}`,
       description: 'Created just now',
       lastModified: 'Just now',
     };
     
-    // Create project on backend
     try {
-      await fetch('/api/projects', {
+      const res = await fetch(apiUrl('/api/projects/create'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: newProject.id, name: newProject.name }),
+        body: JSON.stringify({ name: newProject.name, template: 'react-ts' }),
       });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(data.error || 'Failed to create project');
+      }
+
+      const project = await res.json();
+      if (project?.id) {
+        newProject = {
+          ...newProject,
+          id: project.id,
+          name: project.name || newProject.name,
+        };
+      }
     } catch (err) {
-      console.error('Failed to create project:', err);
+      const message = err instanceof Error ? err.message : 'Failed to create project';
+      setCreateError(message);
     }
     
+    // Keep local UX flowing even when Docker is unavailable.
     setProjects([newProject, ...projects]);
     onSelectProject(newProject.id);
+    setIsCreating(false);
   };
 
   return (
@@ -90,19 +112,26 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
           <h2 className="text-lg font-semibold">Projects</h2>
           <button
             onClick={createNewProject}
-            className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm"
+            disabled={isCreating}
+            className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm disabled:text-slate-500"
           >
             <Plus className="w-4 h-4" />
-            <span>New</span>
+            <span>{isCreating ? 'Creating...' : 'New'}</span>
           </button>
         </div>
+
+        {createError && (
+          <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+            Backend project create failed: {createError}. Continuing in local mode.
+          </div>
+        )}
 
         <div className="space-y-3">
           {projects.map((project) => (
             <button
               key={project.id}
               onClick={() => onSelectProject(project.id)}
-              className="w-full bg-slate-800 hover:bg-slate-750 rounded-xl p-4 border border-slate-700 text-left transition-colors"
+              className="w-full bg-slate-800 hover:bg-slate-700 rounded-xl p-4 border border-slate-700 text-left transition-colors"
             >
               <div className="flex items-start space-x-3">
                 <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center flex-shrink-0">

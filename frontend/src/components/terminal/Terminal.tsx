@@ -3,6 +3,7 @@ import { Terminal as XTerm } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import 'xterm/css/xterm.css';
+import { wsUrl } from '../../config/runtime';
 
 interface TerminalProps {
   sessionId: string;
@@ -35,7 +36,7 @@ export function Terminal({ sessionId }: TerminalProps) {
       fitAddon.fit();
     });
 
-    const ws = new WebSocket(`ws://localhost:3001/ws/terminal?session=${sessionId}`);
+    const ws = new WebSocket(wsUrl(`/ws/terminal?session=${encodeURIComponent(sessionId)}`));
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -74,11 +75,11 @@ export function Terminal({ sessionId }: TerminalProps) {
   }, [sessionId]);
 
   return (
-    <div className="h-48 bg-slate-800 border-t border-slate-700">
+    <div className="h-full bg-slate-800 border-t border-slate-700 flex flex-col">
       <div className="px-3 py-1 text-xs text-slate-400 border-b border-slate-700">
         Terminal
       </div>
-      <div ref={terminalRef} className="h-full" />
+      <div ref={terminalRef} className="flex-1" />
     </div>
   );
 }

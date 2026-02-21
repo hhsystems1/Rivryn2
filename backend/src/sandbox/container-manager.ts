@@ -2,6 +2,7 @@ import Docker from 'dockerode';
 import fs from 'fs/promises';
 import path from 'path';
 import { Project } from '../types';
+import { scaffoldStarterProject } from '../projects/starter-templates';
 
 export class ContainerManager {
   private docker: Docker;
@@ -11,33 +12,41 @@ export class ContainerManager {
     this.docker = new Docker();
   }
 
-  async createProject(name: string, template: string): Promise<Project> {
+  async createProject(name: string, template = 'react-ts'): Promise<Project> {
     const id = `rivryn-${name}-${Date.now()}`;
-    const projectPath = path.join(process.cwd(), 'projects', id);
+    const projectPath = path.join(process.cwd(), 'files', id);
     await fs.mkdir(projectPath, { recursive: true });
-
-    const container = await this.docker.createContainer({
-      Image: 'rivryn-base:latest',
-      name: id,
-      HostConfig: {
-        Binds: [`${projectPath}:/workspace`],
-        PortBindings: { '3000/tcp': [{ HostPort: '0' }] },
-        Memory: 512 * 1024 * 1024,
-        CpuQuota: 50000
-      },
-      WorkingDir: '/workspace',
-      Cmd: ['sleep', 'infinity']
-    });
-
-    await container.start();
+    await scaffoldStarterProject(projectPath, template);
 
     const project: Project = {
       id,
       name,
-      containerId: container.id,
-      status: 'running',
+      template,
+      status: 'stopped',
       createdAt: new Date()
     };
+
+    try {
+      const container = await this.docker.createContainer({
+        Image: 'rivryn-base:latest',
+        name: id,
+        HostConfig: {
+          Binds: [`${projectPath}:/workspace`],
+          PortBindings: { '3000/tcp': [{ HostPort: '0' }] },
+          Memory: 512 * 1024 * 1024,
+          CpuQuota: 50000
+        },
+        WorkingDir: '/workspace',
+        Cmd: ['sleep', 'infinity']
+      });
+
+      await container.start();
+      project.containerId = container.id;
+      project.status = 'running';
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      project.warning = `Container unavailable: ${message}`;
+    }
 
     this.projects.set(id, project);
     return project;

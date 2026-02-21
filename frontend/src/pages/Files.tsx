@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, Folder, FileText, RefreshCw, Plus, Trash2 } from 'lucide-react';
 import { useNavigation } from '../stores/navigationStore';
+import { apiUrl } from '../config/runtime';
 
 interface FileNode {
   name: string;
@@ -23,7 +24,7 @@ export function FilesPage({ activeFile, onFileSelect }: FilesPageProps) {
 
   const fetchFiles = () => {
     setLoading(true);
-    fetch('/api/files/')
+    fetch(apiUrl('/api/files/'))
       .then(res => res.json())
       .then(data => {
         setFiles(data.items || []);
@@ -49,7 +50,7 @@ export function FilesPage({ activeFile, onFileSelect }: FilesPageProps) {
   const createNewFile = async () => {
     if (!newFileName.trim()) return;
     try {
-      await fetch(`/api/files/${newFileName}`, {
+      await fetch(apiUrl(`/api/files/${newFileName}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: '' }),
@@ -64,7 +65,7 @@ export function FilesPage({ activeFile, onFileSelect }: FilesPageProps) {
 
   const deleteFile = async (path: string) => {
     try {
-      await fetch(`/api/files/${path}`, { method: 'DELETE' });
+      await fetch(apiUrl(`/api/files/${path}`), { method: 'DELETE' });
       fetchFiles();
     } catch (err) {
       console.error('Failed to delete file:', err);

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import Editor from '@monaco-editor/react';
+import { apiUrl } from '../../config/runtime';
 
 interface MonacoEditorProps {
+  projectId: string;
   filePath: string | null;
 }
 
-export function MonacoEditor({ filePath }: MonacoEditorProps) {
+export function MonacoEditor({ projectId, filePath }: MonacoEditorProps) {
   const [content, setContent] = useState('');
 
   useEffect(() => {
@@ -13,15 +15,15 @@ export function MonacoEditor({ filePath }: MonacoEditorProps) {
       setContent('');
       return;
     }
-    fetch(`/api/files/${filePath}`)
+    fetch(apiUrl(`/api/files/${projectId}/${filePath}`))
       .then(res => res.json())
       .then(data => setContent(data.content || ''))
       .catch(() => setContent(''));
-  }, [filePath]);
+  }, [filePath, projectId]);
 
   const handleSave = (value: string | undefined) => {
     if (!filePath || !value) return;
-    fetch(`/api/files/${filePath}`, {
+    fetch(apiUrl(`/api/files/${projectId}/${filePath}`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: value })

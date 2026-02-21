@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileTree } from '../file-explorer/FileTree';
 import { FileNode } from '../../services/files';
+import { apiUrl } from '../../config/runtime';
 
 interface SidebarProps {
   projectId: string;
@@ -12,7 +13,7 @@ export function Sidebar({ projectId, onFileSelect, activeFile }: SidebarProps) {
   const [files, setFiles] = useState<FileNode[]>([]);
 
   useEffect(() => {
-    fetch(`/api/files/${projectId}`)
+    fetch(apiUrl(`/api/files/${projectId}`))
       .then(res => res.json())
       .then(data => setFiles(data.items || []))
       .catch(() => setFiles([]));

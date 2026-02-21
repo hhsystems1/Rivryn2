@@ -144,6 +144,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, onAction }) => {
     }
   };
 
+  const navDestinations = new Set(['dashboard', 'files', 'code', 'terminal', 'agents', 'integrations', 'settings']);
+  const agentAliases = new Set(['agent-chat', 'skills-ai', 'mcp-servers']);
+
   return (
     <nav
       ref={navbarRef}
@@ -249,10 +252,10 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, onAction }) => {
                 onClick={() => {
                   if (item.view) {
                     setCurrentView(item.view);
-                  } else if (['files', 'terminal', 'settings'].includes(item.id)) {
+                  } else if (agentAliases.has(item.id)) {
+                    handleNavigate('agents');
+                  } else if (navDestinations.has(item.id)) {
                     handleNavigate(item.id);
-                  } else if (['exit-project', 'deploy', 'database'].includes(item.id)) {
-                    handleAction(item.id);
                   } else {
                     handleAction(item.id);
                   }

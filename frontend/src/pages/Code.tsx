@@ -1,10 +1,11 @@
 import { MonacoEditor } from '../components/editor/MonacoEditor';
 
 interface CodePageProps {
+  projectId: string;
   activeFile: string | null;
 }
 
-export function CodePage({ activeFile }: CodePageProps) {
+export function CodePage({ projectId, activeFile }: CodePageProps) {
   return (
     <div className="h-full flex flex-col bg-slate-900 text-slate-200 pb-16">
       <div className="p-4 border-b border-slate-700 flex items-center justify-between">
@@ -19,7 +20,7 @@ export function CodePage({ activeFile }: CodePageProps) {
         )}
       </div>
       <div className="flex-1 relative">
-        <MonacoEditor filePath={activeFile} />
+        <MonacoEditor projectId={projectId} filePath={activeFile} />
       </div>
     </div>
   );

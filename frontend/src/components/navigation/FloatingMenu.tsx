@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, X, Folder, MessageSquare, Terminal, Settings } from 'lucide-react';
 import { useNavigation } from '../../stores/navigationStore';
+import { apiUrl } from '../../config/runtime';
 
 type ModalPage = 'files' | 'agent' | 'terminal' | 'settings';
 
@@ -126,7 +127,7 @@ function FileSheet({ projectId, activeFile, onFileSelect }: { projectId: string;
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/files/${projectId}`)
+    fetch(apiUrl(`/api/files/${projectId}`))
       .then(res => res.json())
       .then(data => {
         console.log('Files API response:', data);
@@ -184,7 +185,7 @@ function AgentSheet({ projectId }: { projectId: string }) {
     setIsLoading(true);
     
     try {
-      const res = await fetch('/api/agents/plan', {
+      const res = await fetch(apiUrl('/api/agents/plan'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, projectId }),
