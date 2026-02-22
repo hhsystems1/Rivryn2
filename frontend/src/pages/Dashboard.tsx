@@ -78,7 +78,12 @@ export function Dashboard({ onSelectProject }: DashboardProps) {
     <div className="h-full flex flex-col bg-slate-900 text-slate-200 p-4 pb-20">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">RivRyn</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <span className="text-2xl font-black leading-none text-white">R</span>
+          </div>
+          <h1 className="text-3xl font-bold">RivRyn</h1>
+        </div>
         <p className="text-slate-400 text-sm">Build with AI agents</p>
       </div>
 
