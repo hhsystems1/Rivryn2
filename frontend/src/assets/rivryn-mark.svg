@@ -1,0 +1,19 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="64" y1="56" x2="202" y2="176" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5A42FF"/>
+      <stop offset="1" stop-color="#C69BFF"/>
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="256" height="256" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="normal"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#glow)" stroke="url(#g1)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M66 112 C96 82, 130 70, 172 74 C198 76, 212 90, 210 108 C208 128, 190 142, 164 154 C182 156, 199 160, 212 170"/>
+    <path d="M108 102 L100 176"/>
+    <path d="M88 133 L116 137"/>
+    <path d="M118 182 C148 190, 176 191, 204 179"/>
+  </g>
+</svg>

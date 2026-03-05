@@ -27,6 +27,7 @@ import {
   Link as LinkIcon,
   Lightbulb,
 } from 'lucide-react';
+import rivrynMark from '../../assets/rivryn-mark.svg';
 
 interface NavbarProps {
   onNavigate?: (page: string) => void;
@@ -182,13 +183,11 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, onAction }) => {
           {/* Agents - Purple gradient with RivRyn badge */}
           <button
             onClick={() => handleNavigate('agents')}
-            className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center transition-all active:scale-95 hover:scale-105"
+            className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center transition-all active:scale-95 hover:scale-105"
+            title="Agents"
             aria-label="Open agents"
           >
-            <MessageSquare className="w-5 h-5 text-white" />
-            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber-400 text-[10px] font-extrabold leading-4 text-slate-900 text-center shadow-sm">
-              R
-            </span>
+            <img src={rivrynMark} alt="Rivryn Agents" className="w-6 h-6 object-contain" />
           </button>
           
           {/* Files - Purple gradient like menu */}
