@@ -10,9 +10,9 @@ interface Project {
 }
 
 const mockProjects: Project[] = [
-  { id: '1', name: 'My App', description: 'React + TypeScript app', lastModified: '2 hours ago' },
-  { id: '2', name: 'API Server', description: 'Express backend', lastModified: '1 day ago' },
-  { id: '3', name: 'Python Script', description: 'Data processing', lastModified: '3 days ago' },
+  { id: 'mock-my-app', name: 'My App', description: 'React + TypeScript app', lastModified: '2 hours ago' },
+  { id: 'mock-api-server', name: 'API Server', description: 'Express backend', lastModified: '1 day ago' },
+  { id: 'mock-python-script', name: 'Python Script', description: 'Data processing', lastModified: '3 days ago' },
 ];
 
 interface DashboardProps {

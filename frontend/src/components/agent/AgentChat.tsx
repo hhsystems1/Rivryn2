@@ -131,7 +131,7 @@ export function AgentChat({ projectId }: AgentChatProps) {
 
     setPrompt('');
     setMessages((prev) => [...prev, {
-      id: `user-${Date.now()}`,
+      id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       role: 'system',
       content: trimmed,
       type: 'thinking'
