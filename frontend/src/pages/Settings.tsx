@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
+  Bot,
   CheckCircle2,
   CloudCog,
   Github,
@@ -33,6 +34,30 @@ import {
   startGoogleConnect
 } from '../services/sidekick';
 
+type ProviderName = 'ollama' | 'openai' | 'codex';
+
+const PROVIDER_KEY = 'rivryn_llm_provider';
+const OPENAI_KEY_KEY = 'rivryn_openai_api_key';
+const CODEX_KEY_KEY = 'rivryn_codex_token';
+const OLLAMA_KEY_KEY = 'rivryn_ollama_api_key';
+const OLLAMA_HOST_KEY = 'rivryn_ollama_host';
+
+function loadProvider(): ProviderName {
+  return (localStorage.getItem(PROVIDER_KEY) as ProviderName) || 'ollama';
+}
+
+function loadApiKey(key: string): string {
+  return localStorage.getItem(key) || '';
+}
+
+function saveToStorage(key: string, value: string): void {
+  if (value) {
+    localStorage.setItem(key, value);
+  } else {
+    localStorage.removeItem(key);
+  }
+}
+
 type SyncState = 'idle' | 'saving' | 'saved' | 'failed';
 
 export function SettingsPage() {
@@ -57,6 +82,12 @@ export function SettingsPage() {
   const [auditLog, setAuditLog] = useState<AuditEvent[]>(loadAuditLog());
   const [deployStatus, setDeployStatus] = useState<string>('No deploy status loaded yet.');
   const [deployLoading, setDeployLoading] = useState(false);
+
+  const [llmProvider, setLlmProvider] = useState<ProviderName>(loadProvider);
+  const [openaiKey, setOpenaiKey] = useState(loadApiKey(OPENAI_KEY_KEY));
+  const [codexToken, setCodexToken] = useState(loadApiKey(CODEX_KEY_KEY));
+  const [ollamaApiKey, setOllamaApiKey] = useState(loadApiKey(OLLAMA_KEY_KEY));
+  const [ollamaHost, setOllamaHost] = useState(loadApiKey(OLLAMA_HOST_KEY) || 'https://api.ollama.ai');
 
   const sidekickConnected = Boolean(userId && getPrimaryAccountKey() === userId);
 
@@ -413,6 +444,93 @@ export function SettingsPage() {
             Save Project Context
           </button>
           {contextError && <p className="mt-2 text-xs text-amber-300">{contextError}</p>}
+        </section>
+
+        <section className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <h2 className="font-semibold mb-3 flex items-center gap-2">
+            <Bot className="w-4 h-4 text-blue-400" />
+            LLM Provider
+          </h2>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-slate-400 block mb-1">Provider</label>
+              <select
+                value={llmProvider}
+                onChange={(e) => {
+                  const val = e.target.value as ProviderName;
+                  setLlmProvider(val);
+                  saveToStorage(PROVIDER_KEY, val);
+                }}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              >
+                <option value="ollama">Ollama (Cloud)</option>
+                <option value="openai">OpenAI GPT</option>
+                <option value="codex">Codex / GitHub Copilot</option>
+              </select>
+            </div>
+
+            {llmProvider === 'ollama' && (
+              <>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">Ollama Host</label>
+                  <input
+                    value={ollamaHost}
+                    onChange={(e) => {
+                      setOllamaHost(e.target.value);
+                      saveToStorage(OLLAMA_HOST_KEY, e.target.value);
+                    }}
+                    placeholder="https://api.ollama.ai"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block mb-1">Ollama API Key (optional)</label>
+                  <input
+                    type="password"
+                    value={ollamaApiKey}
+                    onChange={(e) => {
+                      setOllamaApiKey(e.target.value);
+                      saveToStorage(OLLAMA_KEY_KEY, e.target.value);
+                    }}
+                    placeholder="ollama_api_key"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </>
+            )}
+
+            {llmProvider === 'openai' && (
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">OpenAI API Key</label>
+                <input
+                  type="password"
+                  value={openaiKey}
+                  onChange={(e) => {
+                    setOpenaiKey(e.target.value);
+                    saveToStorage(OPENAI_KEY_KEY, e.target.value);
+                  }}
+                  placeholder="sk-..."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            )}
+
+            {llmProvider === 'codex' && (
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">Codex / GitHub Copilot Token</label>
+                <input
+                  type="password"
+                  value={codexToken}
+                  onChange={(e) => {
+                    setCodexToken(e.target.value);
+                    saveToStorage(CODEX_KEY_KEY, e.target.value);
+                  }}
+                  placeholder="ghu_... or github_token"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            )}
+          </div>
         </section>
 
         <section className="bg-slate-800 rounded-xl p-4 border border-slate-700">

@@ -34,6 +34,7 @@ function App() {
 
   const handleSelectProject = (projectId: string) => {
     setActiveProject(projectId);
+    localStorage.setItem('rivryn_active_project', projectId);
     setPage('files');
   };
 

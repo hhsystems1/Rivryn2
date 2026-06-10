@@ -4,7 +4,9 @@ import helmet from 'helmet';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { errorHandler } from './api/middleware/errorHandler';
+import { authMiddleware } from './api/middleware/auth';
 import { agentRoutes } from './api/routes/agents';
+import { agentRunRoutes } from './agent/agent-routes';
 import { buildJobRoutes } from './api/routes/build-jobs';
 import { fileRoutes } from './api/routes/files';
 import { healthRoutes } from './api/routes/health';
@@ -22,8 +24,11 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+app.use('/api', authMiddleware);
+
 app.use('/api/health', healthRoutes);
 app.use('/api/agents', agentRoutes);
+app.use('/api/agent', agentRunRoutes);
 app.use('/api/build-jobs', buildJobRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/terminal', terminalRoutes);

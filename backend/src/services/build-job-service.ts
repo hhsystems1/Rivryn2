@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
-import { OllamaClient } from '../llm/ollama-client';
+import { LLMProvider } from '../llm/types';
+import { createProvider } from '../llm/provider-factory';
 import { PromptLoader } from '../llm/prompt-loader';
 import {
   BuildArtifact,
@@ -15,12 +16,12 @@ const MAX_LIST_RESULTS = 100;
 export class BuildJobService {
   private readonly jobs = new Map<string, BuildJob>();
   private readonly queue: string[] = [];
-  private readonly ollama: OllamaClient;
+  private readonly llm: LLMProvider;
   private readonly prompts: PromptLoader;
   private processing = false;
 
-  constructor(ollama = new OllamaClient(), prompts = new PromptLoader()) {
-    this.ollama = ollama;
+  constructor(llm?: LLMProvider, prompts = new PromptLoader()) {
+    this.llm = llm || createProvider();
     this.prompts = prompts;
   }
 
@@ -127,14 +128,14 @@ export class BuildJobService {
     const plannerSystem = plannerPrompt || 'You are a planner that creates concise build plans.';
 
     this.appendLog(job, 'info', 'Planning app generation steps');
-    const plan = await this.ollama.generate(plannerSystem, job.input.prompt, job.input.context);
+    const plan = await this.llm.generate(plannerSystem, job.input.prompt, job.input.context);
     this.pushArtifact(job, 'plan', plan, { generator: 'planner' });
 
     const coderPrompt = await this.prompts.load('agents/coder');
     const coderSystem = coderPrompt || 'You are a coding agent that outputs implementation instructions.';
 
     this.appendLog(job, 'info', 'Drafting implementation instructions');
-    const specification = await this.ollama.generate(
+    const specification = await this.llm.generate(
       coderSystem,
       [
         `Project name: ${job.input.projectName}`,
