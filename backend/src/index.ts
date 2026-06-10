@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import { errorHandler } from './api/middleware/errorHandler';
 import { authMiddleware } from './api/middleware/auth';
+import { loginRoutes } from './api/routes/login';
 import { agentRoutes } from './api/routes/agents';
 import { agentRunRoutes } from './agent/agent-routes';
 import { buildJobRoutes } from './api/routes/build-jobs';
@@ -24,6 +25,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/login', loginRoutes);
 app.use('/api', authMiddleware);
 
 app.use('/api/health', healthRoutes);

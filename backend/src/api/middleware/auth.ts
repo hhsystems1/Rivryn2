@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-
-const API_KEY = process.env.API_AUTH_TOKEN || '';
+import { getAuthToken } from './auth-state';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
-  if (!API_KEY) {
+  const validToken = getAuthToken();
+  if (!validToken) {
     next();
     return;
   }
@@ -20,7 +20,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     return;
   }
 
-  if (token !== API_KEY) {
+  if (token !== validToken) {
     res.status(403).json({ error: 'Invalid auth token' });
     return;
   }

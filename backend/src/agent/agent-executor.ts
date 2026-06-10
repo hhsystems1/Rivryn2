@@ -44,12 +44,13 @@ export async function* executeAgent(
   userPrompt: string,
   projectId: string,
   providerName?: string,
-  sessionId?: string
+  sessionId?: string,
+  apiKey?: string
 ): AsyncGenerator<AgentEvent> {
   sessionId = sessionId || `${projectId}-${Date.now()}`;
   let llm: LLMProvider;
   try {
-    llm = createProvider(providerName);
+    llm = createProvider(providerName, apiKey);
   } catch (error) {
     yield { type: 'error', message: `Failed to create provider: ${error}` };
     return;

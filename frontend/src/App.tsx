@@ -7,6 +7,8 @@ import { TerminalPage } from './pages/Terminal';
 import { AgentsPage } from './pages/Agents';
 import { IntegrationsPage } from './pages/Integrations';
 import { SettingsPage } from './pages/Settings';
+import { LoginPage } from './pages/Login';
+import { isAuthenticated } from './services/auth';
 import { apiUrl } from './config/runtime';
 
 interface PendingApproval {
@@ -19,7 +21,12 @@ function App() {
   const [activeProject, setActiveProject] = useState<string>('default');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [pendingApproval, setPendingApproval] = useState<PendingApproval | null>(null);
+  const [authenticated, setAuthenticated] = useState(isAuthenticated);
   const { currentPage, setPage } = useNavigation();
+
+  if (!authenticated) {
+    return <LoginPage onLogin={() => setAuthenticated(true)} />;
+  }
 
   const sensitiveReasons: Record<string, string> = {
     deploy: 'This can impact production and money-related usage.',
@@ -65,7 +72,7 @@ function App() {
       case 'integrations':
         return <IntegrationsPage />;
       case 'settings':
-        return <SettingsPage />;
+        return <SettingsPage onLogout={() => setAuthenticated(false)} />;
       default:
         return <Dashboard onSelectProject={handleSelectProject} />;
     }

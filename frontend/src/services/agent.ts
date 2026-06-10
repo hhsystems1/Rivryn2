@@ -1,4 +1,5 @@
 import { apiUrl } from '../config/runtime';
+import { getToken } from './auth';
 
 export type AgentEvent =
   | { type: 'thinking'; content: string }
@@ -31,16 +32,17 @@ export async function runAgent(options: AgentRunOptions): Promise<string | undef
   const apiKey = localStorage.getItem(providerKey[storedProvider] || '') || '';
   const sessionId = `agent-${projectId}-${Date.now()}`;
 
+  const token = getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (apiKey) {
-    headers['Authorization'] = `Bearer ${apiKey}`;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   try {
     const res = await fetch(apiUrl('/api/agent/run'), {
       method: 'POST',
       headers,
-      body: JSON.stringify({ prompt, projectId, provider: storedProvider, sessionId })
+      body: JSON.stringify({ prompt, projectId, provider: storedProvider, sessionId, apiKey })
     });
 
     if (!res.ok) {
@@ -107,9 +109,15 @@ export async function approveToolCall(
   callId: string,
   approved: boolean
 ): Promise<void> {
+  const token = getToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const res = await fetch(apiUrl('/api/agent/approve'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ sessionId, callId, approved })
   });
 

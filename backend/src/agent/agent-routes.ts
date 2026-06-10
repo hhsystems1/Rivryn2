@@ -4,7 +4,7 @@ import { executeAgent, resolveApproval } from './agent-executor';
 const router = Router();
 
 router.post('/run', (req: Request, res: Response) => {
-  const { prompt, projectId, provider, sessionId } = req.body;
+  const { prompt, projectId, provider, sessionId, apiKey } = req.body;
 
   if (!prompt || typeof prompt !== 'string') {
     return res.status(400).json({ error: 'prompt is required and must be a string' });
@@ -22,7 +22,7 @@ router.post('/run', (req: Request, res: Response) => {
 
   const run = async () => {
     try {
-      const generator = executeAgent(prompt, projectId, provider, sessionId);
+      const generator = executeAgent(prompt, projectId, provider, sessionId, apiKey);
 
       for await (const event of generator) {
         const data = JSON.stringify(event);

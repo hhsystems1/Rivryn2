@@ -40,7 +40,7 @@ coverage/
 docker-compose.override.yml
 
 # Projects data (user files)
-projects/
+/projects/
 
 # Misc
 .cache/

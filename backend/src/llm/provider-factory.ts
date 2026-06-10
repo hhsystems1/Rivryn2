@@ -3,22 +3,24 @@ import { OllamaClient } from './ollama-client';
 import { OpenAIClient } from './openai-client';
 import { CodexClient } from './codex-client';
 
-const providerConstructors: Record<ProviderName, () => LLMProvider> = {
-  ollama: () => new OllamaClient(),
-  openai: () => new OpenAIClient(),
-  codex: () => new CodexClient()
-};
+function createProviderForName(name: ProviderName, apiKey?: string): LLMProvider {
+  switch (name) {
+    case 'openai':
+      return new OpenAIClient(apiKey);
+    case 'codex':
+      return new CodexClient(apiKey);
+    case 'ollama':
+      return new OllamaClient(undefined, undefined, apiKey);
+    default:
+      throw new Error(`Unknown provider: ${name}`);
+  }
+}
 
-export function createProvider(name?: string): LLMProvider {
+export function createProvider(name?: string, apiKey?: string): LLMProvider {
   const providerName = (name || process.env.LLM_PROVIDER || 'ollama') as ProviderName;
 
-  if (!(providerName in providerConstructors)) {
-    console.warn(`Unknown LLM provider "${providerName}". Falling back to ollama.`);
-    return new OllamaClient();
-  }
-
   try {
-    return providerConstructors[providerName]();
+    return createProviderForName(providerName, apiKey);
   } catch (error) {
     console.error(`Failed to create provider "${providerName}":`, error);
     console.warn('Falling back to ollama.');
