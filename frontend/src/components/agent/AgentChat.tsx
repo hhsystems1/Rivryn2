@@ -183,7 +183,7 @@ export function AgentChat({ projectId }: AgentChatProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-900 text-slate-200">
+    <div className="h-full flex flex-col bg-slate-900 text-slate-200 pb-16">
       <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-4">
         {messages.length === 0 && (
           <div className="text-center text-slate-500 mt-8">
